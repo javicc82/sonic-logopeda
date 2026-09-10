@@ -1,7 +1,5 @@
 // Service Worker — Sonic Speech Run
-// Cachea todos los archivos para uso offline
-
-const CACHE_NAME = 'sonic-speech-run-v2';
+const CACHE_NAME = 'sonic-speech-run-v3';
 const FILES = [
   './',
   './index.html',
@@ -13,19 +11,13 @@ const FILES = [
   'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&display=swap'
 ];
 
-// Instalar: cachear todos los archivos
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES).catch(err => {
-        console.log('Cache parcial (fuentes pueden fallar offline):', err);
-      });
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES).catch(err => console.log('Cache error:', err)))
   );
   self.skipWaiting();
 });
 
-// Activar: limpiar caches viejas
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -35,12 +27,10 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: servir desde caché, con fallback a red
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cached => {
       return cached || fetch(event.request).then(response => {
-        // Cachear recursos nuevos dinámicamente
         if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
@@ -48,10 +38,7 @@ self.addEventListener('fetch', event => {
         return response;
       });
     }).catch(() => {
-      // Offline fallback
-      if (event.request.destination === 'document') {
-        return caches.match('./index.html');
-      }
+      if (event.request.destination === 'document') return caches.match('./index.html');
     })
   );
 });

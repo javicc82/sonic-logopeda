@@ -1,8 +1,9 @@
 // =============================================
 // SONIC SPEECH RUN — app.js
+// 100% Infantil, Sin Almacenamiento, Con Reto Diario
 // =============================================
 
-// ---- EJERCICIOS (Deglución Atípica - Actualizado) ----
+// ---- EJERCICIOS (Deglución Atípica) ----
 const EXERCISES = [
   {
     id: 1,
@@ -156,54 +157,127 @@ const EXERCISES = [
   }
 ];
 
-// ---- CHAOS EMERALDS (medallas) — todas usan anillo dorado ----
-const EMERALDS = [
-  { id: "first_day",   name: "1er Día",    condition: d => d.totalDays >= 1 },
-  { id: "three_days",  name: "3 Días",      condition: d => d.totalDays >= 3 },
-  { id: "perfect",     name: "Perfecto",    condition: d => d.perfectDays >= 1 },
-  { id: "streak_3",    name: "Racha x3",    condition: d => d.maxStreak >= 3 },
-  { id: "streak_7",    name: "¡Semana!",    condition: d => d.maxStreak >= 7 },
-  { id: "rings_50",    name: "50 Anillos",  condition: d => d.totalRings >= 50 },
-  { id: "all_emeralds",name: "Super Sonic", condition: d => d.perfectDays >= 3 },
-];
+// =============================================
+// EFECTOS DE SONIDO SINTETIZADOS (Web Audio API)
+// 100% Offline, sin archivos de audio externos
+// =============================================
+let audioCtx = null;
+let soundEnabled = true;
 
-// =============================================
-// ESTADO
-// =============================================
-let state = {
-  currentExercise: 0,
-  ratings: [],
-  ringsCollected: 0,
-  timerInterval: null,
-  timerSeconds: 60,
-  timerRunning: false,
-  timerDone: false,
-};
-
-// =============================================
-// LOCAL STORAGE
-// =============================================
-function loadData() {
-  try {
-    const s = localStorage.getItem('sonic-speech-run');
-    return s ? JSON.parse(s) : defaultData();
-  } catch { return defaultData(); }
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx) audioCtx = new AudioCtx();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
 }
 
-function defaultData() {
-  return {
-    history: [],
-    streak: 0,
-    maxStreak: 0,
-    lastDate: null,
-    totalDays: 0,
-    perfectDays: 0,
-    totalRings: 0,
-  };
+function playRingSound(count = 1) {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      try {
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(987.77, now); // B5
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1318.51, now + 0.04); // E6
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.06);
+        osc2.start(now + 0.04);
+        osc2.stop(now + 0.22);
+      } catch (e) {}
+    }, i * 110);
+  }
 }
 
-function saveData(data) {
-  localStorage.setItem('sonic-speech-run', JSON.stringify(data));
+function playVictorySound() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const notes = [523.25, 659.25, 783.99, 1046.50];
+  notes.forEach((freq, idx) => {
+    setTimeout(() => {
+      try {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx === notes.length - 1 ? 0.9 : 0.25));
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + (idx === notes.length - 1 ? 0.9 : 0.25));
+      } catch (e) {}
+    }, idx * 130);
+  });
+}
+
+function playCheerSound() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const notes = [659.25, 880.00];
+  notes.forEach((freq, idx) => {
+    setTimeout(() => {
+      try {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.4);
+      } catch (e) {}
+    }, idx * 160);
+  });
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btns = document.querySelectorAll('.btn-sound-toggle');
+  btns.forEach(b => { b.textContent = soundEnabled ? '🔊' : '🔇'; });
+}
+
+// =============================================
+// OBJETIVO DIARIO DINÁMICO (Cero memoria persistente)
+// =============================================
+function getDailyTarget() {
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+  // Semilla única y predecible por fecha
+  const seed = (year * 372) + (month * 31) + day;
+  // Objetivo entre 32 y 44 anillos (el máximo es 48)
+  return 32 + (seed % 13);
 }
 
 function getTodayStr() {
@@ -218,10 +292,19 @@ function formatDate(str) {
   return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]}`;
 }
 
-function hasDoneToday() {
-  const data = loadData();
-  return data.history.some(h => h.date === getTodayStr());
-}
+// =============================================
+// ESTADO EN MEMORIA VOLÁTIL (Se reinicia siempre)
+// =============================================
+let state = {
+  currentExercise: 0,
+  ratings: [],
+  ringsCollected: 0,
+  dailyTarget: getDailyTarget(),
+  timerInterval: null,
+  timerSeconds: 60,
+  timerRunning: false,
+  timerDone: false,
+};
 
 // =============================================
 // NAVEGACIÓN
@@ -239,52 +322,37 @@ function goHome() {
 }
 
 function goToExercises() {
-  const today = getTodayStr();
-  const data  = loadData();
-  const done  = data.history.find(h => h.date === today);
+  // Inicializar contexto de audio con la primera interacción del usuario
+  getAudioContext();
 
-  if (done) {
-    showCelebration(done.ratings, done.totalRings, true);
-    return;
-  }
-
-  // Reiniciar estado
+  // Reiniciar estado completamente
   state.currentExercise = 0;
   state.ratings         = new Array(EXERCISES.length).fill(0);
   state.ringsCollected  = 0;
+  state.dailyTarget     = getDailyTarget();
   clearTimerIfRunning();
 
   document.getElementById('total-ex').textContent = EXERCISES.length;
+  document.getElementById('hud-target-num').textContent = state.dailyTarget;
   updateRingsBar();
   loadExercise(0);
   showScreen('screen-exercises');
 }
 
-function goToStats() {
-  renderStats();
-  showScreen('screen-stats');
-}
-
 // =============================================
-// HOME SCREEN
+// PANTALLA INICIO
 // =============================================
 function updateHomeScreen() {
   const today = getTodayStr();
   document.getElementById('date-display').textContent = formatDate(today);
 
-  const data = loadData();
-  document.getElementById('hud-total-rings').textContent = data.totalRings;
-  document.getElementById('hud-streak').textContent      = data.streak + '🔥';
-  document.getElementById('hud-total-days').textContent  = data.totalDays;
+  state.dailyTarget = getDailyTarget();
+  const targetEl = document.getElementById('home-target-num');
+  if (targetEl) targetEl.textContent = state.dailyTarget;
 
   const btn = document.getElementById('btn-start');
-  if (hasDoneToday()) {
-    btn.textContent = '✓ YA COMPLETADO HOY';
-    btn.style.background = 'linear-gradient(135deg, #00897B, #00E676)';
-  } else {
-    btn.textContent = '▶ PRESS START';
-    btn.style.background = '';
-  }
+  btn.textContent = '▶ PRESS START';
+  btn.style.background = '';
 }
 
 // =============================================
@@ -293,16 +361,16 @@ function updateHomeScreen() {
 function loadExercise(index) {
   const ex = EXERCISES[index];
 
-  // Limpiar timer si lo había
   clearTimerIfRunning();
   state.timerDone = false;
 
   // Actualizar HUD
   document.getElementById('current-ex').textContent = index + 1;
   document.getElementById('rings-count').textContent = state.ringsCollected;
+  document.getElementById('hud-target-num').textContent = state.dailyTarget;
   updateRingsBar();
 
-  // Tarjeta
+  // Tarjeta de ejercicio
   const card = document.getElementById('exercise-card');
   card.classList.remove('completed');
   const oldCheck = card.querySelector('.done-check');
@@ -332,7 +400,6 @@ function loadExercise(index) {
   // Botones de anillos
   resetRatingButtons();
   const btnDone = document.getElementById('btn-done');
-  // Si tiene timer, el botón se habilita solo al completar el timer O al puntuar
   btnDone.disabled = true;
 
   // Animación de entrada
@@ -351,17 +418,41 @@ function resetRatingButtons() {
   }
 }
 
-function rateExercise(value) {
+function spawnFloatingText(text, x, y) {
+  const el = document.createElement('div');
+  el.className = 'floating-ring-text';
+  el.textContent = text;
+  el.style.left = `${x}px`;
+  el.style.top  = `${y}px`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function rateExercise(value, evt) {
   state.ratings[state.currentExercise] = value;
 
-  // Visual
+  // Visual de botones seleccionados
   for (let i = 1; i <= 3; i++) {
     const btn = document.getElementById('ring-' + i);
     if (!btn) continue;
     i <= value ? btn.classList.add('selected') : btn.classList.remove('selected');
   }
 
-  // Habilitar "ZONE CLEAR" (si tiene timer, solo si timer ya terminó también)
+  // Sonido de anillo estilo Sonic
+  playRingSound(value);
+
+  // Animación de texto flotante (+1, +2, +3 anillos)
+  if (evt && evt.clientX) {
+    spawnFloatingText(`+${value} 💍`, evt.clientX - 20, evt.clientY - 40);
+  } else {
+    const btn = document.getElementById('ring-' + value);
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      spawnFloatingText(`+${value} 💍`, rect.left + rect.width / 2 - 20, rect.top - 20);
+    }
+  }
+
+  // Habilitar botón ZONE CLEAR (si tiene timer, solo si ya terminó)
   const ex = EXERCISES[state.currentExercise];
   if (!ex.hasTimer || state.timerDone) {
     document.getElementById('btn-done').disabled = false;
@@ -369,11 +460,11 @@ function rateExercise(value) {
 
   // Mensaje Sonic
   const msgs = {
-    1: ['¡Sigue intentándolo! 💪', '¡Mañana mejor! 🌱'],
-    2: ['¡Bien hecho! 👍', '¡Buen trabajo! ⚡'],
-    3: ['¡RING GET! 💍', '¡INCREÍBLE! 🌟', '¡PERFECTO! 🏆']
+    1: ['¡Buen esfuerzo! 💪', '¡Sigue así, velocista! 🌱'],
+    2: ['¡Gran trabajo! 👍', '¡A toda velocidad! ⚡'],
+    3: ['¡RING GET! 💍✨', '¡INCREÍBLE! 🌟', '¡PERFECTO! 🏆']
   };
-  const pool = msgs[value];
+  const pool = msgs[value] || msgs[3];
   document.getElementById('mascot-speech').textContent = pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -385,27 +476,38 @@ function markDone() {
   state.ringsCollected += rating;
   document.getElementById('rings-count').textContent = state.ringsCollected;
 
-  // Efecto tarjeta completada
+  // Animación del contador de anillos en HUD
+  const counterEl = document.querySelector('.rings-counter');
+  if (counterEl) {
+    counterEl.classList.remove('ring-bump');
+    void counterEl.offsetWidth; // trigger reflow
+    counterEl.classList.add('ring-bump');
+  }
+
+  // Tarjeta en verde
   const card = document.getElementById('exercise-card');
   card.classList.add('completed');
-  const check = document.createElement('div');
-  check.className = 'done-check';
-  check.textContent = '✓ CLEAR';
-  card.appendChild(check);
+  if (!card.querySelector('.done-check')) {
+    const check = document.createElement('div');
+    check.className = 'done-check';
+    check.textContent = '✓ ZONE CLEAR';
+    card.appendChild(check);
+  }
 
-  const next = index + 1;
-  if (next < EXERCISES.length) {
-    setTimeout(() => {
+  // Siguiente ejercicio o celebración
+  setTimeout(() => {
+    const next = state.currentExercise + 1;
+    if (next < EXERCISES.length) {
       state.currentExercise = next;
       loadExercise(next);
-    }, 700);
-  } else {
-    setTimeout(() => finishSession(), 700);
-  }
+    } else {
+      finishSession();
+    }
+  }, 450);
 }
 
 // =============================================
-// CRONÓMETRO (ejercicio lápiz)
+// CRONÓMETRO
 // =============================================
 const CIRCUMFERENCE = 2 * Math.PI * 52; // ~327
 
@@ -429,6 +531,7 @@ function resetTimerUI(seconds) {
 
 function startTimer() {
   if (state.timerRunning) return;
+  getAudioContext();
 
   const ex       = EXERCISES[state.currentExercise];
   const total    = ex.timerDuration || 60;
@@ -448,11 +551,9 @@ function startTimer() {
     state.timerSeconds--;
     numEl.textContent = state.timerSeconds;
 
-    // Actualizar arco SVG
     const progress = state.timerSeconds / total;
     circle.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
-    // Cambiar color si queda poco tiempo
     if (state.timerSeconds <= 10) {
       circle.className = 'timer-fill timer-warning';
       numEl.style.color = '#FF7043';
@@ -469,11 +570,9 @@ function startTimer() {
       startBtn.textContent   = '✓ COMPLETADO';
       statusEl.textContent   = '¡RING GET! 💍 ¡Perfecto!';
 
-      // Habilitar botón de continuar si ya tiene valoración
       if (state.ratings[state.currentExercise] > 0) {
         document.getElementById('btn-done').disabled = false;
       } else {
-        // Auto-dar 3 estrellas si completó el timer completo
         rateExercise(3);
       }
     }
@@ -489,64 +588,53 @@ function clearTimerIfRunning() {
 }
 
 // =============================================
-// FINALIZAR SESIÓN
+// FINALIZAR SESIÓN Y CELEBRACIÓN
 // =============================================
 function finishSession() {
-  const today = getTodayStr();
-  const data  = loadData();
-
-  const totalRings = state.ringsCollected;
-  const maxPossible = EXERCISES.length * 3;
-  const isPerfect   = totalRings === maxPossible;
-
-  // Actualizar racha
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-  if (data.lastDate === yesterdayStr) {
-    data.streak += 1;
-  } else if (data.lastDate !== today) {
-    data.streak = 1;
-  }
-
-  data.maxStreak  = Math.max(data.maxStreak, data.streak);
-  data.lastDate   = today;
-  data.totalDays  += 1;
-  data.totalRings += totalRings;
-  if (isPerfect) data.perfectDays += 1;
-
-  if (!data.history.find(h => h.date === today)) {
-    data.history.push({
-      date: today,
-      ratings: [...state.ratings],
-      totalRings,
-      isPerfect
-    });
-  }
-
-  saveData(data);
-  showCelebration(state.ratings, totalRings, false);
+  showCelebration(state.ratings, state.ringsCollected);
 }
 
-// =============================================
-// CELEBRACIÓN
-// =============================================
-function showCelebration(ratings, totalRings, alreadyDone) {
-  const maxPossible = EXERCISES.length * 3;
+function showCelebration(ratings, totalRings) {
+  const achieved = totalRings >= state.dailyTarget;
+  const celBadge = document.getElementById('cel-badge');
+  const celMainTitle = document.getElementById('cel-main-title');
+  const celSonic = document.getElementById('cel-sonic');
+  const celMessage = document.getElementById('cel-message');
+  const celRings = document.getElementById('cel-rings');
+  const celTarget = document.getElementById('cel-target');
+  const celResult = document.getElementById('cel-result');
 
-  document.getElementById('cel-rings').textContent    = totalRings + ' 💍';
-  document.getElementById('cel-exercises').textContent = EXERCISES.length + '/' + EXERCISES.length;
-  document.getElementById('cel-bonus').textContent    = totalRings === maxPossible ? '¡PERFECTO! ⚡' : '—';
+  celRings.textContent  = totalRings + ' 💍';
+  celTarget.textContent = state.dailyTarget + ' 🎯';
 
-  // Mostrar anillos ganados en celebración
+  if (achieved) {
+    celBadge.textContent = '🏆 ¡RETO CONSEGUIDO!';
+    celBadge.className = 'cel-badge badge-win';
+    celMainTitle.textContent = 'MISIÓN CUMPLIDA!!';
+    celSonic.textContent = '🦔💨⚡';
+    celMessage.textContent = '¡Increíble! ¡Has superado el reto de hoy con velocidad supersónica!';
+    celResult.textContent = '¡SUPERADO! 🏆';
+    celResult.style.color = '#00E676';
+    playVictorySound();
+  } else {
+    celBadge.textContent = '⭐ ¡GRAN ENTRENAMIENTO!';
+    celBadge.className = 'cel-badge badge-good';
+    celMainTitle.textContent = '¡MUY BIEN HECHO!';
+    celSonic.textContent = '🦔👍✨';
+    celMessage.textContent = `¡Has sumado ${totalRings} anillos! Cada día lo haces mejor. ¡Mañana habrá un reto nuevo!`;
+    celResult.textContent = '¡CASI! Mañana más 🔥';
+    celResult.style.color = '#FFD600';
+    playCheerSound();
+  }
+
+  // Anillos visuales obtenidos
   const RING_SVG = `<svg class="cel-ring" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/><circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/></svg>`;
   const display = document.getElementById('rings-earned-display');
   display.innerHTML = ratings.map(r =>
     r >= 1 ? RING_SVG : '<span style="opacity:0.2;font-size:22px;">○</span>'
   ).join('');
 
-  if (!alreadyDone) launchConfetti();
+  launchConfetti();
   showScreen('screen-celebration');
 }
 
@@ -571,123 +659,6 @@ function launchConfetti() {
 }
 
 // =============================================
-// ESTADÍSTICAS
-// =============================================
-function renderStats() {
-  const data    = loadData();
-  const last7   = data.history.slice(-7);
-  const content = document.getElementById('records-content');
-  content.innerHTML = '';
-
-  // Top stats
-  const topDiv = document.createElement('div');
-  topDiv.className = 'stat-grid-top';
-  topDiv.innerHTML = `
-    <div class="stat-top-card">
-      <span class="stat-top-emoji">🔥</span>
-      <span class="stat-top-value">${data.streak}</span>
-      <span class="stat-top-label">RACHA</span>
-    </div>
-    <div class="stat-top-card">
-      <span class="stat-top-emoji">💍</span>
-      <span class="stat-top-value">${data.totalRings}</span>
-      <span class="stat-top-label">ANILLOS</span>
-    </div>
-    <div class="stat-top-card">
-      <span class="stat-top-emoji">💎</span>
-      <span class="stat-top-value">${data.perfectDays}</span>
-      <span class="stat-top-label">PERFECTOS</span>
-    </div>
-  `;
-  content.appendChild(topDiv);
-
-  // Por ejercicio
-  const label = document.createElement('p');
-  label.className = 'stat-section-title';
-  label.textContent = 'ÚLTIMOS 7 DÍAS POR ZONA';
-  content.appendChild(label);
-
-  EXERCISES.forEach((ex, idx) => {
-    const exRatings = last7.map(d => (d.ratings && d.ratings[idx]) || 0).filter(r => r > 0);
-    const avg = exRatings.length ? exRatings.reduce((a,b) => a+b, 0) / exRatings.length : 0;
-    const pct = (avg / 3) * 100;
-    const color = avg >= 2.5 ? '#00E676' : avg >= 1.5 ? '#FFD600' : '#F44336';
-
-    const card = document.createElement('div');
-    card.className = 'stat-ex-card';
-    card.innerHTML = `
-      <span class="stat-ex-emoji">${ex.emoji}</span>
-      <div class="stat-ex-info">
-        <div class="stat-ex-name">${ex.name}</div>
-        <div class="stat-ex-bar-wrap">
-          <div class="stat-ex-bar" style="width:${pct}%;background:${color};"></div>
-        </div>
-      </div>
-      <div class="stat-ex-rings">${avg > 0 ? avg.toFixed(1)+'💍' : '—'}</div>
-    `;
-    content.appendChild(card);
-  });
-
-  // Chaos Emeralds
-  renderEmeralds(data);
-}
-
-function renderEmeralds(data) {
-  const RING_SVG = `<svg class="chaos-ring-svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/><circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/></svg>`;
-  const grid = document.getElementById('chaos-grid');
-  grid.innerHTML = '';
-  EMERALDS.forEach(em => {
-    const earned = em.condition(data);
-    const item   = document.createElement('div');
-    item.className = 'chaos-item ' + (earned ? 'earned' : 'locked');
-    item.innerHTML = earned
-      ? `${RING_SVG}<span class="chaos-name">${em.name}</span>`
-      : `<span class="chaos-emoji">🔒</span><span class="chaos-name">${em.name}</span>`;
-    grid.appendChild(item);
-  });
-}
-
-// =============================================
-// PANEL ADMIN (3 taps en imagen Sonic)
-// =============================================
-let tapCount = 0, tapTimer = null;
-
-function handleMascotTap() {
-  tapCount++;
-  clearTimeout(tapTimer);
-  tapTimer = setTimeout(() => { tapCount = 0; }, 600);
-  if (tapCount >= 3) {
-    tapCount = 0;
-    document.getElementById('admin-panel').style.display = 'block';
-  }
-}
-
-function closeAdmin() {
-  document.getElementById('admin-panel').style.display = 'none';
-}
-
-function toggleAdminOverride() {
-  const cur = state.ratings[state.currentExercise] || 0;
-  rateExercise((cur % 3) + 1);
-  closeAdmin();
-}
-
-// =============================================
-// RESET
-// =============================================
-function confirmReset() {
-  if (confirm('¿Resetear los datos de la semana? No se puede deshacer.')) {
-    const data   = loadData();
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
-    const cutoffStr = cutoff.toISOString().split('T')[0];
-    data.history = data.history.filter(h => h.date < cutoffStr);
-    saveData(data);
-    renderStats();
-  }
-}
-
-// =============================================
 // UTILIDADES
 // =============================================
 function hexToRgb(hex) {
@@ -699,11 +670,10 @@ function hexToRgb(hex) {
 // INIT
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
-  updateHomeScreen();
+  // Limpiar cualquier residuo de localStorage anterior
+  try { localStorage.removeItem('sonic-speech-run'); } catch(e) {}
 
-  // Tap en imagen Sonic para panel admin
-  const mascot = document.getElementById('mascot-ex');
-  if (mascot) mascot.addEventListener('click', handleMascotTap);
+  updateHomeScreen();
 
   // Prevenir scroll rebote en iOS
   document.addEventListener('touchmove', e => {

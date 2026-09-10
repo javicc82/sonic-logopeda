@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -22,20 +22,9 @@
     <div class="speed-bg"></div>
     <div class="home-wrap">
 
-      <!-- HUD top bar -->
-      <div class="hud-bar">
-        <div class="hud-item">
-          <span class="hud-label">ANILLOS</span>
-          <span class="hud-value" id="hud-total-rings">0</span>
-        </div>
-        <div class="hud-item">
-          <span class="hud-label">RACHA</span>
-          <span class="hud-value hud-streak" id="hud-streak">0🔥</span>
-        </div>
-        <div class="hud-item">
-          <span class="hud-label">DÍAS</span>
-          <span class="hud-value" id="hud-total-days">0</span>
-        </div>
+      <!-- Botón de sonido flotante -->
+      <div class="home-top-controls">
+        <button class="btn-sound-toggle" onclick="toggleSound()" title="Activar/Silenciar sonido">🔊</button>
       </div>
 
       <!-- Sonic corriendo -->
@@ -57,12 +46,20 @@
         <span id="date-display">Cargando...</span>
       </div>
 
+      <!-- Tarjeta Misión de Hoy -->
+      <div class="daily-mission-card">
+        <div class="mission-tag">⚡ MISIÓN DE HOY ⚡</div>
+        <div class="mission-target-wrap">
+          <span class="mission-ring-icon">💍</span>
+          <span class="mission-target-num" id="home-target-num">38</span>
+          <span class="mission-target-text">ANILLOS</span>
+        </div>
+        <div class="mission-desc">¡Entrena hoy tus 16 zonas y supera el reto!</div>
+      </div>
+
       <!-- Botón PRESS START -->
       <button class="btn-press-start" id="btn-start" onclick="goToExercises()">
         ▶ PRESS START
-      </button>
-      <button class="btn-records" onclick="goToStats()">
-        🏆 RECORDS
       </button>
 
     </div>
@@ -84,7 +81,9 @@
       <div class="rings-counter">
         <svg class="ring-svg-hud" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="url(#rg)" stroke-width="6"/><defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFE566"/><stop offset="50%" stop-color="#FFD600"/><stop offset="100%" stop-color="#CC9900"/></linearGradient></defs></svg>
         <span id="rings-count">0</span>
+        <span class="rings-goal-badge">/<span id="hud-target-num">38</span>🎯</span>
       </div>
+      <button class="btn-sound-toggle hud-sound-btn" onclick="toggleSound()" title="Sonido">🔊</button>
     </div>
 
     <!-- Sonic comentando -->
@@ -93,107 +92,65 @@
       <div class="sonic-bubble" id="mascot-speech">¡Vamos!</div>
     </div>
 
-    <!-- Tarjeta de ejercicio -->
-    <div class="exercise-card" id="exercise-card">
-      <div class="ex-zone-badge" id="ex-zone-badge">ZONA 1</div>
-      <div class="exercise-emoji" id="exercise-emoji">👃</div>
-      <h2 class="exercise-name" id="exercise-name">Ejercicio</h2>
-      <p class="exercise-desc" id="exercise-desc">Descripción</p>
-      <div class="exercise-reps-wrap">
-        <span class="reps-badge" id="reps-text">5 veces</span>
+    <!-- Tarjeta del ejercicio actual -->
+    <div class="exercise-area">
+      <div class="zone-badge" id="ex-zone-badge">ZONA 1</div>
+      <div class="exercise-card" id="exercise-card">
+        <div class="exercise-emoji" id="exercise-emoji">👃</div>
+        <h2 class="exercise-name" id="exercise-name">Ejercicio</h2>
+        <p class="exercise-desc" id="exercise-desc">Descripción</p>
+        <div class="exercise-reps-wrap">
+          <span class="reps-label">REPETICIONES:</span>
+          <span class="reps-value" id="reps-text">—</span>
+        </div>
       </div>
 
-      <!-- CRONÓMETRO — solo visible en el ejercicio del lápiz -->
+      <!-- Cronómetro circular -->
       <div class="timer-wrap" id="timer-wrap" style="display:none;">
-        <div class="timer-ring-container">
+        <div class="timer-circle-wrap">
           <svg class="timer-svg" viewBox="0 0 120 120">
-            <circle class="timer-track" cx="60" cy="60" r="52"/>
-            <circle class="timer-fill" id="timer-circle" cx="60" cy="60" r="52"/>
+            <circle class="timer-track" cx="60" cy="60" r="52" />
+            <circle class="timer-fill" id="timer-circle" cx="60" cy="60" r="52" />
           </svg>
-          <div class="timer-number-wrap">
+          <div class="timer-display">
             <span class="timer-number" id="timer-number">60</span>
-            <span class="timer-label">seg</span>
+            <span class="timer-unit">SEG</span>
           </div>
         </div>
-        <button class="btn-timer-start" id="btn-timer-start" onclick="startTimer()">
-          ⏱ INICIAR
-        </button>
-        <div class="timer-status" id="timer-status"></div>
+        <div class="timer-actions">
+          <button class="btn-timer-start" id="btn-timer-start" onclick="startTimer()">
+            ⏱ INICIAR
+          </button>
+          <div class="timer-status" id="timer-status"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- SVG gradiente global reutilizable -->
-    <svg width="0" height="0" style="position:absolute;">
-      <defs>
-        <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stop-color="#FFE566"/>
-          <stop offset="50%"  stop-color="#FFD600"/>
-          <stop offset="100%" stop-color="#CC9900"/>
-        </linearGradient>
-      </defs>
-    </svg>
-
-    <!-- Valoración con anillos -->
-    <div class="rating-area">
-      <p class="rating-label">¿CUÁNTOS ANILLOS MERECES?</p>
-      <div class="rings-rating" id="rings-rating">
-        <button class="ring-btn" onclick="rateExercise(1)" id="ring-1">
-          <svg class="ring-svg" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-          </svg>
-          <span class="ring-text">x1</span>
-        </button>
-        <button class="ring-btn" onclick="rateExercise(2)" id="ring-2">
-          <div class="rings-stack">
-            <svg class="ring-svg" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-              <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-            </svg>
-            <svg class="ring-svg ring-offset" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-              <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-            </svg>
-          </div>
-          <span class="ring-text">x2</span>
-        </button>
-        <button class="ring-btn ring-btn-gold" onclick="rateExercise(3)" id="ring-3">
-          <div class="rings-stack">
-            <svg class="ring-svg" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-              <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-            </svg>
-            <svg class="ring-svg ring-offset" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-              <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-            </svg>
-            <svg class="ring-svg ring-offset" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="14" fill="none" stroke="url(#goldRing)" stroke-width="7"/>
-              <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="4 9" transform="rotate(-30,20,20)"/>
-            </svg>
-          </div>
-          <span class="ring-text">x3</span>
-        </button>
+      <!-- Selector de Anillos -->
+      <div class="rating-wrap">
+        <div class="rating-title">¡CONSIGUE ANILLOS!</div>
+        <div class="rating-buttons">
+          <button class="ring-btn" id="ring-1" onclick="rateExercise(1, event)">
+            <img src="ring.png" alt="Anillo" class="ring-img-btn" />
+            <span class="ring-lbl">1</span>
+          </button>
+          <button class="ring-btn" id="ring-2" onclick="rateExercise(2, event)">
+            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
+            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
+            <span class="ring-lbl">2</span>
+          </button>
+          <button class="ring-btn" id="ring-3" onclick="rateExercise(3, event)">
+            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
+            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
+            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
+            <span class="ring-lbl">3</span>
+          </button>
+        </div>
       </div>
-      <div class="ring-hints">
-        <span>😓 Difícil</span>
-        <span>💪 Bien</span>
-        <span>⚡ ¡SONIC!</span>
-      </div>
-    </div>
 
-    <!-- Botón CLEAR ZONE -->
-    <div class="action-area">
-      <button class="btn-clear-zone" id="btn-done" onclick="markDone()" disabled>
-        ✓ ZONE CLEAR!
+      <!-- Botón ZONE CLEAR -->
+      <button class="btn-zone-clear" id="btn-done" onclick="markDone()" disabled>
+        ZONE CLEAR &gt;&gt;
       </button>
-    </div>
-
-    <!-- Admin panel oculto -->
-    <div class="admin-panel" id="admin-panel" style="display:none;">
-      <div class="admin-title">🎮 Modo logopeda</div>
-      <button class="admin-btn" onclick="toggleAdminOverride()">Cambiar valoración</button>
-      <button class="admin-btn admin-close" onclick="closeAdmin()">Cerrar</button>
     </div>
   </div>
 
@@ -201,49 +158,51 @@
   <div id="screen-celebration" class="screen">
     <div class="speed-bg speed-fast"></div>
     <div class="celebration-wrap">
-      <div class="stage-clear-label">STAGE</div>
-      <div class="stage-clear-main">CLEAR!!</div>
-      <div class="sonic-celebrate">🦔✨</div>
+      <div class="cel-badge" id="cel-badge">🏆 ¡RETO CONSEGUIDO!</div>
+      <div class="stage-clear-main" id="cel-main-title">MISIÓN CUMPLIDA!!</div>
+      <div class="sonic-celebrate" id="cel-sonic">🦔✨</div>
+      <div class="cel-message" id="cel-message">¡Increíble!</div>
+
       <div class="score-board">
         <div class="score-row">
           <span>ANILLOS RECOGIDOS</span>
-          <span id="cel-rings">0</span>
+          <span id="cel-rings">0 💍</span>
         </div>
         <div class="score-row">
-          <span>EJERCICIOS</span>
-          <span id="cel-exercises">0/16</span>
+          <span>OBJETIVO DE HOY</span>
+          <span id="cel-target">38 🎯</span>
         </div>
         <div class="score-row score-row-total">
-          <span>⭐ BONUS PERFECTO</span>
-          <span id="cel-bonus">—</span>
+          <span>RESULTADO</span>
+          <span id="cel-result">¡SUPERADO! ⚡</span>
         </div>
       </div>
+
       <div class="rings-earned-display" id="rings-earned-display"></div>
       <div class="confetti-container" id="confetti"></div>
-      <button class="btn-title-screen" onclick="goHome()">
-        🏠 TITLE SCREEN
-      </button>
+
+      <div class="cel-buttons">
+        <button class="btn-press-start" onclick="goToExercises()">
+          ▶ JUGAR OTRA VEZ
+        </button>
+        <button class="btn-title-screen" onclick="goHome()">
+          🏠 INICIO
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- ============ PANTALLA RECORDS ============ -->
-  <div id="screen-stats" class="screen">
-    <div class="speed-bg"></div>
-    <div class="records-header">
-      <button class="btn-back-hud" onclick="goHome()">◀ ESC</button>
-      <div class="records-title">🏆 HIGH SCORES</div>
-    </div>
-    <div class="records-content" id="records-content">
-      <!-- JS -->
-    </div>
-    <div class="chaos-section">
-      <div class="chaos-title">💎 CHAOS EMERALDS</div>
-      <div class="chaos-grid" id="chaos-grid">
-        <!-- JS -->
-      </div>
-    </div>
-    <button class="btn-reset" onclick="confirmReset()">🗑️ Resetear semana</button>
-  </div>
+  <!-- SVG GRADIENTS GLOBALES -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFF176"/>
+        <stop offset="30%" stop-color="#FFD600"/>
+        <stop offset="70%" stop-color="#FF9800"/>
+        <stop offset="100%" stop-color="#E65100"/>
+      </linearGradient>
+    </defs>
+  </svg>
 
   <script src="app.js"></script>
 </body>
