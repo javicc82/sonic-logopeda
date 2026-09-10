@@ -2,15 +2,14 @@
 // SONIC SPEECH RUN — app.js
 // =============================================
 
-// ---- EJERCICIOS ----
-// Ejercicio 6: hasTimer:true activa el cronómetro de 1 minuto
+// ---- EJERCICIOS (Deglución Atípica - Actualizado) ----
 const EXERCISES = [
   {
     id: 1,
     name: "Respirar por la nariz",
     emoji: "👃",
-    desc: "Inspira y espira usando SOLO la nariz, nunca la boca. Primero tapa una nariz y respira por la otra, luego al revés.",
-    reps: "5 veces cada nariz",
+    desc: "Inspira y espira usando SOLO la nariz, nunca la boca. Por una narina y luego por la otra.",
+    reps: "5 veces cada lado",
     speech: "¡Respira fuerte, como Sonic antes de correr! 💨",
     color: "#29B6F6"
   },
@@ -18,40 +17,31 @@ const EXERCISES = [
     id: 2,
     name: "Soplar con pajita",
     emoji: "🥤",
-    desc: "Coge un vaso de agua y sopla burbujas con la pajita. ¡Intenta hacer muchas burbujas sin parar!",
+    desc: "Con un vaso de agua, sopla burbujas con la pajita. ¡Intenta hacer muchas burbujas sin parar!",
     reps: "10 segundos",
     speech: "¡Burbujas a toda velocidad! 🫧",
     color: "#06d6a0"
   },
   {
     id: 3,
-    name: "Mordisco de labios",
-    emoji: "😬",
-    desc: "Muerde suavemente con los dientes de abajo el labio de arriba. Luego con los dientes de arriba el labio de abajo.",
-    reps: "5 veces cada lado",
-    speech: "¡Suave suave, campeón! 😄",
-    color: "#F44336"
-  },
-  {
-    id: 4,
     name: "Lengua por fuera de los dientes",
     emoji: "👄",
-    desc: "Con la boca cerrada, pasa la lengua por fuera de todos los dientes. Primero hacia un lado y luego hacia el otro.",
-    reps: "5 veces cada dirección",
-    speech: "¡Da la vuelta entera! 🔄",
+    desc: "Con la boca cerrada, pasa la lengua por fuera de todos los dientes. Hacia un lado y luego hacia el otro.",
+    reps: "5 vueltas cada lado",
+    speech: "¡Da la vuelta entera como un loop! 🔄",
     color: "#9C27B0"
   },
   {
-    id: 5,
+    id: 4,
     name: "Lengua por los labios",
     emoji: "👅",
-    desc: "Pasa la lengua por el labio de arriba y luego por el labio de abajo. ¡Despacio y bien hecho!",
+    desc: "Pasa la lengua bien estirada por el labio de arriba y luego por el labio de abajo.",
     reps: "8 veces",
-    speech: "¡Arriba y abajo como Sonic salta! ⬆️⬇️",
+    speech: "¡Arriba y abajo como saltando plataformas! ⬆️⬇️",
     color: "#FF9800"
   },
   {
-    id: 6,
+    id: 5,
     name: "Sostener el lápiz",
     emoji: "🖊️",
     desc: "Pon los labios en morritos y aguanta un lápiz sujeto solo con los labios. ¡Sin que se caiga un minuto entero!",
@@ -59,34 +49,110 @@ const EXERCISES = [
     speech: "¡Quieto! ¡Que no caiga el lápiz! 🎯",
     color: "#FFD600",
     hasTimer: true,
-    timerDuration: 60
+    timerDuration: 60,
+    timerMsg: "¡No sueltes el lápiz!"
+  },
+  {
+    id: 6,
+    name: "Soplar globos por la nariz",
+    emoji: "🎈",
+    desc: "Coge aire exclusivamente por la nariz e intenta inflar el globo soplando con fuerza.",
+    reps: "5 veces",
+    speech: "¡Infla el globo con propulsión sónica! 🚀",
+    color: "#FF5722"
   },
   {
     id: 7,
     name: "Lengua hacia la nariz",
     emoji: "🫦",
-    desc: "Abre la boca grande, saca la lengua sin rozar los labios e intenta tocar la nariz. También bájala hacia la barbilla y hacia los lados.",
+    desc: "Abre la boca grande, saca la lengua sin rozar los labios. Intenta tocar la nariz, bajar a la barbilla y a los laterales.",
     reps: "5 veces cada dirección",
-    speech: "¡A por la nariz! ¡Tú puedes! 🎯",
-    color: "#29B6F6"
+    speech: "¡A por la nariz! ¡Tú puedes, velocista! 🎯",
+    color: "#00BCD4"
   },
   {
     id: 8,
     name: "Morritos y sonrisa",
     emoji: "😁",
-    desc: "Pon los labios en morritos (como un besito) y luego haz una sonrisa grande. ¡Alterna rápido entre los dos!",
+    desc: "Pon los labios en morritos (como un besito) y luego haz una gran sonrisa. ¡Alterna rápido!",
     reps: "10 veces",
-    speech: "¡Morritos... SONRISA! 😄 ¡Más rápido!",
+    speech: "¡Morritos... SONRISA! 😄 ¡A máxima velocidad!",
     color: "#F44336"
   },
   {
     id: 9,
+    name: "Morritos a los lados",
+    emoji: "😗",
+    desc: "Pon los labios en morritos juntos y muévelos de izquierda a derecha sin abrir la boca.",
+    reps: "10 veces",
+    speech: "¡Curvas cerradas a toda marcha! ↔️",
+    color: "#AB47BC"
+  },
+  {
+    id: 10,
     name: "Pomperos",
     emoji: "🫧",
-    desc: "Usa los pomperos para hacer pompas de jabón. ¡Intenta hacer pompas grandes soplando muy despacio!",
+    desc: "Usa el pompero para hacer pompas de jabón. ¡Sopla despacio y continuo para hacerlas gigantes!",
     reps: "5 pompas",
-    speech: "¡Pompas mágicas al estilo Sonic! ✨",
-    color: "#9C27B0"
+    speech: "¡Pompas mágicas doradas al estilo Sonic! ✨",
+    color: "#00E676"
+  },
+  {
+    id: 11,
+    name: "El Pez",
+    emoji: "🐟",
+    desc: "Haz cara de pez apretando y frunciendo bien los morritos hacia adelante.",
+    reps: "10 veces",
+    speech: "¡Boca de pez en la zona acuática! 🌊",
+    color: "#03A9F4"
+  },
+  {
+    id: 12,
+    name: "El Besito",
+    emoji: "💋",
+    desc: "Desde la posición de labios en beso, lanza besitos sonoros fuertes hacia adelante.",
+    reps: "10 besos",
+    speech: "¡Lanza un beso supersónico! 💥",
+    color: "#E91E63"
+  },
+  {
+    id: 13,
+    name: "El Caballo",
+    emoji: "🐎",
+    desc: "Haz chasquidos fuertes con la lengua contra el paladar imitando el galope de un caballo.",
+    reps: "15 chasquidos",
+    speech: "¡Galope veloz por Green Hill! 🏇",
+    color: "#8D6E63"
+  },
+  {
+    id: 14,
+    name: "Barrido lingual",
+    emoji: "🧹",
+    desc: "Coloca la lengua detrás de los dientes arriba y barre con fuerza todo el paladar hacia atrás.",
+    reps: "8 veces",
+    speech: "¡Limpia la pista a toda velocidad! 🏎️",
+    color: "#26A69A"
+  },
+  {
+    id: 15,
+    name: "Independizar la lengua",
+    emoji: "🎪",
+    desc: "Mueve la punta de la lengua arriba y abajo sin mover la mandíbula ni la barbilla.",
+    reps: "10 veces",
+    speech: "¡Control total de lengua nivel Master! 🎮",
+    color: "#7E57C2"
+  },
+  {
+    id: 16,
+    name: "Sujetar gusanito lingual",
+    emoji: "🐛",
+    desc: "Coloca un trocito de gusanito en la punta de la lengua contra el paladar y sujétalo firme sin moverte.",
+    reps: "30 segundos",
+    speech: "¡Mantén el tesoro bien pegado arriba! 🏆",
+    color: "#FFC107",
+    hasTimer: true,
+    timerDuration: 30,
+    timerMsg: "¡Sujeta el gusanito contra el paladar!"
   }
 ];
 
@@ -376,7 +442,7 @@ function startTimer() {
 
   startBtn.disabled    = true;
   startBtn.textContent = '⏳ CORRIENDO...';
-  statusEl.textContent = '¡No sueltes el lápiz!';
+  statusEl.textContent = ex.timerMsg || '¡Aguanta la posición!';
 
   state.timerInterval = setInterval(() => {
     state.timerSeconds--;

@@ -1,13 +1,14 @@
 // Service Worker — Sonic Speech Run
 // Cachea todos los archivos para uso offline
 
-const CACHE_NAME = 'sonic-speech-run-v1';
+const CACHE_NAME = 'sonic-speech-run-v2';
 const FILES = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './sonic.png',
+  './ring.png',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&display=swap'
 ];
