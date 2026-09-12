@@ -1,11 +1,12 @@
 // Service Worker — Sonic Speech Run
-const CACHE_NAME = 'sonic-speech-run-v4';
+const CACHE_NAME = 'sonic-speech-run-v5';
 const FILES = [
   './',
   './index.html',
   './styles.css',
   './app.js',
   './sonic.png',
+  './sonic-win.png',
   './ring.png',
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&display=swap'

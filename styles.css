@@ -871,7 +871,7 @@ html, body {
 
 .stage-clear-main {
   font-family: 'Bangers', cursive;
-  font-size: 72px;
+  font-size: clamp(38px, 9vw, 68px);
   letter-spacing: 4px;
   background: linear-gradient(180deg, #FFD600 0%, #FF8F00 100%);
   -webkit-background-clip: text;
@@ -887,9 +887,24 @@ html, body {
 }
 
 .sonic-celebrate {
-  font-size: 80px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0;
+}
+
+.sonic-celebrate-img {
+  width: 175px;
+  height: 175px;
+  max-width: 48vw;
+  max-height: 48vw;
+  object-fit: cover;
+  border-radius: 28px;
   animation: sonicBounce 0.6s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 20px rgba(41, 182, 246, 0.8));
+  filter: drop-shadow(0 0 20px rgba(41, 182, 246, 0.85)) drop-shadow(0 0 12px rgba(255, 214, 0, 0.7));
+  border: 3px solid rgba(255, 214, 0, 0.6);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .score-board {

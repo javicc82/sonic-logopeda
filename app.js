@@ -598,7 +598,7 @@ function showCelebration(ratings, totalRings) {
   const achieved = totalRings >= state.dailyTarget;
   const celBadge = document.getElementById('cel-badge');
   const celMainTitle = document.getElementById('cel-main-title');
-  const celSonic = document.getElementById('cel-sonic');
+  const celSonicImg = document.getElementById('cel-sonic-img');
   const celMessage = document.getElementById('cel-message');
   const celRings = document.getElementById('cel-rings');
   const celTarget = document.getElementById('cel-target');
@@ -611,7 +611,10 @@ function showCelebration(ratings, totalRings) {
     celBadge.textContent = '🏆 ¡RETO CONSEGUIDO!';
     celBadge.className = 'cel-badge badge-win';
     celMainTitle.textContent = 'MISIÓN CUMPLIDA!!';
-    celSonic.textContent = '🦔💨⚡';
+    if (celSonicImg) {
+      celSonicImg.src = 'sonic-win.png';
+      celSonicImg.alt = 'Sonic ¡Misión Cumplida!';
+    }
     celMessage.textContent = '¡Increíble! ¡Has superado el reto de hoy con velocidad supersónica!';
     celResult.textContent = '¡SUPERADO! 🏆';
     celResult.style.color = '#00E676';
@@ -620,7 +623,10 @@ function showCelebration(ratings, totalRings) {
     celBadge.textContent = '⭐ ¡GRAN ENTRENAMIENTO!';
     celBadge.className = 'cel-badge badge-good';
     celMainTitle.textContent = '¡MUY BIEN HECHO!';
-    celSonic.textContent = '🦔👍✨';
+    if (celSonicImg) {
+      celSonicImg.src = 'sonic-win.png';
+      celSonicImg.alt = 'Sonic ¡Gran Entrenamiento!';
+    }
     celMessage.textContent = `¡Has sumado ${totalRings} anillos! Cada día lo haces mejor. ¡Mañana habrá un reto nuevo!`;
     celResult.textContent = '¡CASI! Mañana más 🔥';
     celResult.style.color = '#FFD600';
