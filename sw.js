@@ -1,5 +1,5 @@
 // Service Worker — Sonic Speech Run
-const CACHE_NAME = 'sonic-speech-run-v3';
+const CACHE_NAME = 'sonic-speech-run-v4';
 const FILES = [
   './',
   './index.html',

@@ -94,63 +94,75 @@
 
     <!-- Tarjeta del ejercicio actual -->
     <div class="exercise-area">
-      <div class="zone-badge" id="ex-zone-badge">ZONA 1</div>
       <div class="exercise-card" id="exercise-card">
+        <div class="ex-zone-badge zone-badge" id="ex-zone-badge">ZONA 1</div>
         <div class="exercise-emoji" id="exercise-emoji">👃</div>
         <h2 class="exercise-name" id="exercise-name">Ejercicio</h2>
         <p class="exercise-desc" id="exercise-desc">Descripción</p>
         <div class="exercise-reps-wrap">
-          <span class="reps-label">REPETICIONES:</span>
-          <span class="reps-value" id="reps-text">—</span>
+          <span class="reps-badge reps-value" id="reps-text">—</span>
         </div>
-      </div>
 
-      <!-- Cronómetro circular -->
-      <div class="timer-wrap" id="timer-wrap" style="display:none;">
-        <div class="timer-circle-wrap">
-          <svg class="timer-svg" viewBox="0 0 120 120">
-            <circle class="timer-track" cx="60" cy="60" r="52" />
-            <circle class="timer-fill" id="timer-circle" cx="60" cy="60" r="52" />
-          </svg>
-          <div class="timer-display">
-            <span class="timer-number" id="timer-number">60</span>
-            <span class="timer-unit">SEG</span>
+        <!-- Cronómetro circular -->
+        <div class="timer-wrap" id="timer-wrap" style="display:none;">
+          <div class="timer-ring-container timer-circle-wrap">
+            <svg class="timer-svg" viewBox="0 0 120 120">
+              <circle class="timer-track" cx="60" cy="60" r="52" />
+              <circle class="timer-fill" id="timer-circle" cx="60" cy="60" r="52" />
+            </svg>
+            <div class="timer-number-wrap timer-display">
+              <span class="timer-number" id="timer-number">60</span>
+              <span class="timer-label timer-unit">SEG</span>
+            </div>
           </div>
-        </div>
-        <div class="timer-actions">
-          <button class="btn-timer-start" id="btn-timer-start" onclick="startTimer()">
-            ⏱ INICIAR
-          </button>
-          <div class="timer-status" id="timer-status"></div>
+          <div class="timer-actions">
+            <button class="btn-timer-start" id="btn-timer-start" onclick="startTimer()" type="button">
+              ⏱ INICIAR
+            </button>
+            <div class="timer-status" id="timer-status"></div>
+          </div>
         </div>
       </div>
 
       <!-- Selector de Anillos -->
-      <div class="rating-wrap">
-        <div class="rating-title">¡CONSIGUE ANILLOS!</div>
-        <div class="rating-buttons">
-          <button class="ring-btn" id="ring-1" onclick="rateExercise(1, event)">
-            <img src="ring.png" alt="Anillo" class="ring-img-btn" />
-            <span class="ring-lbl">1</span>
+      <div class="rating-area rating-wrap">
+        <div class="rating-label rating-title">¡CONSIGUE ANILLOS!</div>
+        <div class="rings-rating rating-buttons" id="rings-rating">
+          <button class="ring-btn" id="ring-1" onclick="rateExercise(1, event)" type="button" aria-label="1 Anillo">
+            <div class="rings-stack">
+              <img src="ring.png" alt="Anillo" class="ring-img-btn" width="32" height="32" />
+            </div>
+            <span class="ring-text ring-lbl">x1</span>
           </button>
-          <button class="ring-btn" id="ring-2" onclick="rateExercise(2, event)">
-            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
-            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
-            <span class="ring-lbl">2</span>
+          <button class="ring-btn" id="ring-2" onclick="rateExercise(2, event)" type="button" aria-label="2 Anillos">
+            <div class="rings-stack">
+              <img src="ring.png" alt="Anillos" class="ring-img-btn" width="32" height="32" />
+              <img src="ring.png" alt="Anillos" class="ring-img-btn ring-offset" width="32" height="32" />
+            </div>
+            <span class="ring-text ring-lbl">x2</span>
           </button>
-          <button class="ring-btn" id="ring-3" onclick="rateExercise(3, event)">
-            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
-            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
-            <img src="ring.png" alt="Anillos" class="ring-img-btn" />
-            <span class="ring-lbl">3</span>
+          <button class="ring-btn ring-btn-gold" id="ring-3" onclick="rateExercise(3, event)" type="button" aria-label="3 Anillos">
+            <div class="rings-stack">
+              <img src="ring.png" alt="Anillos" class="ring-img-btn" width="32" height="32" />
+              <img src="ring.png" alt="Anillos" class="ring-img-btn ring-offset" width="32" height="32" />
+              <img src="ring.png" alt="Anillos" class="ring-img-btn ring-offset" width="32" height="32" />
+            </div>
+            <span class="ring-text ring-lbl">x3</span>
           </button>
+        </div>
+        <div class="ring-hints">
+          <span>🌱 Bien</span>
+          <span>⚡ ¡Genial!</span>
+          <span>🏆 ¡Sonic!</span>
         </div>
       </div>
 
       <!-- Botón ZONE CLEAR -->
-      <button class="btn-zone-clear" id="btn-done" onclick="markDone()" disabled>
-        ZONE CLEAR &gt;&gt;
-      </button>
+      <div class="action-area">
+        <button class="btn-clear-zone btn-zone-clear" id="btn-done" onclick="markDone()" disabled type="button">
+          ZONE CLEAR &gt;&gt;
+        </button>
+      </div>
     </div>
   </div>
 
